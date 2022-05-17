@@ -2,7 +2,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     async function getResponse(value) {
         let response = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=b1625996a2671911894f6d328d58325e&language=en-US&query=${value}&page=1&include_adult=false`)
-        console.log(response);
+        // console.log(response);
         if (response.ok) {
             return await response.json();
         } else {
@@ -15,16 +15,20 @@ window.addEventListener('DOMContentLoaded', () => {
 
     async function post(json) {
         // console.log(json);
-        let post = await fetch('some-url', {
+        let post = await fetch('http://localhost:3000/recipes', {
             method: 'POST',
             headers: { 'Content-type': 'application/json' },
             body: json
         });
-        // console.log(post)
+        // console.log(post);
+        resetForm();
+
+
         if (!post.ok) {
             console.log('POST не сработал, это консоль лог');
             throw new Error(`POST не сработал этот ERROR`);
         };
+
     };
 
     function randomNumber(min, max) {
@@ -44,7 +48,7 @@ window.addEventListener('DOMContentLoaded', () => {
         // console.log(obj);
 
         let formData = new FormData(form);
-        // formData.append('id', randomNumber(1, 9999));
+        formData.append('id', randomNumber(1, 9999));
         // console.log(formData);
 
         let objForm = {};
@@ -82,7 +86,7 @@ window.addEventListener('DOMContentLoaded', () => {
         console.log(objForm);
 
         let json = JSON.stringify(objForm);
-
+        // console.log(json);
         post(json);
     };
 
@@ -151,7 +155,7 @@ window.addEventListener('DOMContentLoaded', () => {
         measurement.setAttribute('class', `measurement${increment}`);
         measurement.setAttribute('name', `measurement${increment}`);
         nameInput.before(`Ingridient ${increment}: `);
-        console.log(form);
+        // console.log(form);
         return increment++;
     };
 
@@ -161,34 +165,31 @@ window.addEventListener('DOMContentLoaded', () => {
         // console.log(deletDivs);
         deletDivs.forEach(div => div.remove());
         let form2 = document.forms.main;
-        console.log(form2.elements.name);
+        // console.log(form2.elements.name);
         form2.elements.name.value = '';
         form2.elements.age.value = '';
+        inputUrl.value = '';
         return increment = 1;
     };
 
     let searchPanel = document.querySelector('.search-panel');
+    let searchValue = document.querySelector('.search');
     let inputUrl = document.querySelector('.readonly');
     let form = document.forms.main;
     let inputsDiv = document.querySelector('.inputs');
     let temp = document.querySelector('.newIngridientTemp');
     let increment = 1;
+    let resData;
+    let divPoster;
 
-    document.querySelector('.search').addEventListener('input', (e) => {
+    searchValue.addEventListener('input', (e) => {
         // console.log(e.target.value);
         getResponse(e.target.value)
-            .then(data => creatCard(data))
+            .then(data => {
+                creatCard(data)
+                return resData = data.results;
+            })
             .catch(err => new Error(`Так так, вот такая ошибка ${err}`))
-    });
-
-    form.elements.submit.addEventListener('click', (e) => {
-        postForm(e);
-    });
-
-    form.elements.newIngredient.addEventListener('click', (e) => {
-        e.preventDefault();
-        // console.log(e.target);
-        addIngridient();
     });
 
     searchPanel.addEventListener('click', (e) => {
@@ -197,10 +198,109 @@ window.addEventListener('DOMContentLoaded', () => {
             inputUrl.value = e.target.src;
             searchPanel.innerHTML = '';
             searchPanel.style.display = 'none';
+            searchValue.value = '';
         };
     });
+
+    searchPanel.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+
+        // console.log(e);
+        if (e.target.hasAttribute('src')) {
+            // console.log(resData);
+            if (divPoster) {
+                divPoster.remove();
+                divPoster = 0;
+            };
+            resData.forEach(elem => {
+
+                if (`https://image.tmdb.org/t/p/w185${elem.poster_path}` == e.target.getAttribute('src')) {
+                    // console.log(elem);
+                    divPoster = document.createElement('div');
+                    divPoster.classList.add('poster');
+                    divPoster.innerHTML = `<div class="close"><button>Close</button></div><h3>Название: ${validateRes(elem)}</h3><img src="https://image.tmdb.org/t/p/w185${elem.poster_path}"><br /><b>Стредняя оценка:</b> ${elem.vote_average}<br /><b>Всего голосов:</b> ${elem.vote_count}<h4>Описание фильма</h4><p>${elem.overview}</p>`;
+                    document.body.prepend(divPoster);
+                    window.addEventListener('keydown', e => {
+                        if (e.code == 'Escape') {
+                            if (divPoster) {
+                                divPoster.remove();
+                                divPoster = 0;
+                            };
+                        };
+                    });
+                    document.querySelector('.close').addEventListener('click', e => {
+                        // console.log(e);
+                        if (divPoster) {
+                            divPoster.remove();
+                            divPoster = 0;
+                        };
+                    });
+                };
+            });
+            window.addEventListener('click', e => {
+                if (e.target.parentElement === null) {
+                    if (divPoster) {
+                        divPoster.remove();
+                        divPoster = 0;
+                    };
+                } else if (e.target.parentElement.classList.contains('poster') || e.target.classList.contains('poster')) {
+                    return;
+                } else {
+                    if (divPoster) {
+                        divPoster.remove();
+                        divPoster = 0;
+                    };
+                };
+            });
+        };
+    });
+
+    function validateRes(elem) {
+        if (!elem.original_title) {
+            return elem.name;
+        } else return elem.original_title;
+    };
+
+    form.elements.submit.addEventListener('click', (e) => {
+        if (divPoster) {
+            divPoster.remove();
+            divPoster = 0;
+        };
+        postForm(e);
+    });
+
+    form.elements.newIngredient.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (divPoster) {
+            divPoster.remove();
+            divPoster = 0;
+        };
+        // console.log(e.target);
+        addIngridient();
+    });
+
     form.reset.addEventListener('click', e => {
         e.preventDefault();
+        if (divPoster) {
+            divPoster.remove();
+            divPoster = 0;
+        };
         resetForm();
     });
+
+    window.addEventListener('keydown', e => {
+
+        if (e.code == 'Escape') {
+            if (searchPanel.style.display == 'flex' && !!divPoster) {
+                divPoster.remove();
+                divPoster = 0;
+            } else searchPanel.style.display = 'none';
+        };
+    });
+
+    // window.addEventListener('keydown', e => {
+    //     if (e.code == 'KeyA') {
+    //         console.log(searchPanel.style.display == 'flex' && !!divPoster);
+    //     };
+    // });
 });
