@@ -74,7 +74,7 @@ form {
 input {
     margin: 3px;
     padding: 3px;
-    width: 500px;
+    width: 200px;
 }
 
 button {
@@ -82,7 +82,17 @@ button {
     padding: 3px;
 }
 
-.readonly {
+.url {
     background-color: rgb(209, 209, 209);
     color: rgb(161, 161, 161);
+}
+
+.input-span {
+    padding-left: 200px;
+}
+.error {
+    color: red;
+    padding-left:10px;
+    margin-right: 5px;
+    display: none;
 }

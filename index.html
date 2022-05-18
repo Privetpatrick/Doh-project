@@ -12,8 +12,8 @@
 <body>
     <template class="newIngridientTemp">
         <div class="new-ingridient">
-            <input class="inputName" name="ingridient1">
-            <span>Количество: <input class="amoumt" name="amoumt1" type="number"><select class="measurement" name="measurement1"><option value="gramm">gramm</option>
+            <input class="ingridient" name="ingridient1"><span class="error">Заполните поле</span>
+            <span class="input-span">Количество: <input class="amount" name="amount1" type="number"><span class="error">Заполните поле</span><select class="measurement" name="measurement1"><option value="gramm">gramm</option>
                     <option value="ml">ml</option>
                     <option value="kg">kg</option>
                 </select></span>
@@ -23,12 +23,13 @@
     <section>
         <form name="main" id="main">
             <div class="inputs">
-                <div>Name: <input type="text" name="name"></div>
-                <div>age: <input type="text" name="age"></div>
+                <div>Name: <input type="text" name="name" class="name"><span class="error">Заполните поле</span></div>
+                <div>age: <input type="text" name="age" class="age"><span class="error">Заполните поле</span></div>
             </div>
-            <div>Picture: <input class="readonly" type="text" name="url" readonly></div>
+            <div>Picture: <input class="url" type="text" name="url" readonly><span class="error">Выберите картинку</span></div>
             <button name="newIngredient">Add ingredient</button>
-            <button name="reset">Reset</button><br />
+            <button name="deleteIngredient" style="display: none;">Delete ingredient</button><br />
+            <button name="reset">Reset</button>
             <button name="submit" type="submit">Submit</button><br />
         </form>
         <div>Search and pick your picture

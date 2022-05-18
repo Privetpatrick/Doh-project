@@ -21,12 +21,13 @@ window.addEventListener('DOMContentLoaded', () => {
             body: json
         });
         // console.log(post);
-        resetForm();
-
-
+ 
         if (!post.ok) {
             console.log('POST не сработал, это консоль лог');
             throw new Error(`POST не сработал этот ERROR`);
+        } else {
+            resetForm();
+            console.log(post);
         };
 
     };
@@ -37,8 +38,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-    function postForm(e) {
-        e.preventDefault();
+    function postForm() {
 
         // let obj = {
         //     name: form.elements.name.value,
@@ -54,41 +54,70 @@ window.addEventListener('DOMContentLoaded', () => {
         let objForm = {};
 
         formData.forEach((value, key) => {
-            objForm[key] = value;
+            if (!value) {
+                erorrForm(key);
+                return objForm = 0;
+            };
         });
 
-        let ingridients = [];
-        let amoumts = [];
-        let measurements = [];
+        if (!objForm) {
+            throw new Error('форма не валидна, идет проверка');
+        } else {
+            formData.forEach((value, key) => {
+                objForm[key] = value;
+            });
+            // for (const [key, value] of Object.entries(objForm)) {
 
-        for (key in objForm) {
-            if (key.includes('ingridient')) {
-                ingridients.push(objForm[key]);
-                delete objForm[key];
+            //     if (!value) {
+            //         erorrForm(key);
+            //     };
+            // };
+
+            let ingridients = [];
+            let amounts = [];
+            let measurements = [];
+
+            for (key in objForm) {
+                if (key.includes('ingridient')) {
+                    ingridients.push(objForm[key]);
+                    delete objForm[key];
+                };
+                if (key.includes('amount')) {
+                    amounts.push(objForm[key]);
+                    delete objForm[key];
+                };
+                if (key.includes('measurement')) {
+                    measurements.push(objForm[key]);
+                    delete objForm[key];
+                };
             };
-            if (key.includes('amoumt')) {
-                amoumts.push(objForm[key]);
-                delete objForm[key];
-            };
-            if (key.includes('measurement')) {
-                measurements.push(objForm[key]);
-                delete objForm[key];
-            };
+            let amountMeasure = amounts.map((value, key) => value + " " + measurements[key]);
+
+            let ingridientsFull = ingridients.map((value, key) => {
+                return { [value]: amountMeasure[key] };
+            });
+
+            objForm.ingridients = ingridientsFull;
+
+            console.log(objForm);
+
+            let json = JSON.stringify(objForm);
+            // console.log(json);
+            post(json);
         };
-        let amountMeasure = amoumts.map((value, key) => value + " " + measurements[key]);
-
-        let ingridientsFull = ingridients.map((value, key) => {
-            return { [value]: amountMeasure[key] };
-        });
-
-        objForm.ingridients = ingridientsFull;
-
-        console.log(objForm);
-
-        let json = JSON.stringify(objForm);
-        // console.log(json);
-        post(json);
     };
+
+    function erorrForm(key) {
+        // console.log(key); 
+        // let anyNum = /[0-9]+/;
+        // console.log(anyNum.test(key));
+        // if (anyNum.test(key)) {
+            
+            let keyDom = document.querySelector(`.${key}`);
+            console.log(keyDom);
+            keyDom.nextElementSibling.style.display = 'inline';
+
+    }
 
     function creatCard(data) {
         // console.log(data.results);
@@ -124,12 +153,12 @@ window.addEventListener('DOMContentLoaded', () => {
         // let amount = document.createElement('span');
         // amount.innerHTML = `Количество: `;
         // let inputAmount = document.createElement('input');
-        // inputAmount.setAttribute('name', 'amoumt');
+        // inputAmount.setAttribute('name', 'amount');
         // amount.append(inputAmount);
 
         // let measurement = document.createElement('span');
         // let inputMeasurement = document.createElement('input');
-        // inputMeasurement.setAttribute('name', 'amoumt');
+        // inputMeasurement.setAttribute('name', 'amount');
         // amount.append(inputAmount);
 
 
@@ -139,18 +168,16 @@ window.addEventListener('DOMContentLoaded', () => {
 
         let inputIngrid = temp.content.cloneNode(true);
 
-        let input = document.querySelector('input');
-        // console.log(input);
-        // input.setAttribute('name', `Ingridient${increment}`);
-        // console.log(inputIngrid);
         inputsDiv.append(inputIngrid);
-        let nameInput = document.querySelector('.inputName');
-        nameInput.setAttribute('class', `inputName${increment}`);
+        let fullingridient = document.querySelector('.new-ingridient');
+        fullingridient.setAttribute('class', `new-ingridient${increment}`);
+        let nameInput = document.querySelector('.ingridient');
+        nameInput.setAttribute('class', `ingridient${increment}`);
         nameInput.setAttribute('name', `ingridient${increment}`);
         // console.log(nameInput);
-        let amount = document.querySelector('.amoumt');
-        amount.setAttribute('class', `amoumt${increment}`);
-        amount.setAttribute('name', `amoumt${increment}`);
+        let amount = document.querySelector('.amount');
+        amount.setAttribute('class', `amount${increment}`);
+        amount.setAttribute('name', `amount${increment}`);
         let measurement = document.querySelector('.measurement');
         measurement.setAttribute('class', `measurement${increment}`);
         measurement.setAttribute('name', `measurement${increment}`);
@@ -169,12 +196,20 @@ window.addEventListener('DOMContentLoaded', () => {
         form2.elements.name.value = '';
         form2.elements.age.value = '';
         inputUrl.value = '';
+        increment--;
+        while (increment > 0) {
+            let lastIngridient = document.querySelector(`.new-ingridient${increment}`);
+            lastIngridient.remove();
+            increment--;
+        }
+        document.querySelectorAll('.error').forEach(value => value.style.display = 'none');
+
         return increment = 1;
     };
 
     let searchPanel = document.querySelector('.search-panel');
     let searchValue = document.querySelector('.search');
-    let inputUrl = document.querySelector('.readonly');
+    let inputUrl = document.querySelector('.url');
     let form = document.forms.main;
     let inputsDiv = document.querySelector('.inputs');
     let temp = document.querySelector('.newIngridientTemp');
@@ -262,15 +297,17 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     form.elements.submit.addEventListener('click', (e) => {
+        e.preventDefault();
         if (divPoster) {
             divPoster.remove();
             divPoster = 0;
         };
-        postForm(e);
+        postForm();
     });
 
     form.elements.newIngredient.addEventListener('click', (e) => {
         e.preventDefault();
+        form.deleteIngredient.style.display = 'inline';
         if (divPoster) {
             divPoster.remove();
             divPoster = 0;
@@ -296,6 +333,17 @@ window.addEventListener('DOMContentLoaded', () => {
                 divPoster = 0;
             } else searchPanel.style.display = 'none';
         };
+    });
+
+    form.deleteIngredient.addEventListener('click', e => {
+        e.preventDefault();
+        increment--;
+        let lastIngridient = document.querySelector(`.new-ingridient${increment}`);
+        lastIngridient.remove();
+        if (increment == 1) {
+            form.deleteIngredient.style.display = 'none';
+        };
+        return increment;
     });
 
     // window.addEventListener('keydown', e => {
