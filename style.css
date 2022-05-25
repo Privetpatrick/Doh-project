@@ -13,18 +13,33 @@ form {
     position: absolute;
     z-index: 10;
     background-color:rgb(84, 79, 158);
-    width: 400px;
-    margin-top: 10%;
-    margin-left: 35%;
+    /* width: 400px; */
+    /* margin-top: 5%;
+    margin-left: 5%; */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     border: 3px solid white;
     box-shadow: 0 0 30px 60px black, inset 0 0 5px 1px yellow;
 }
 
 .close {
-    margin-left: 340px;
-    position: absolute;
+    /* margin-left: 340px; */
+    /* position: absolute; */
+    float: right;
     z-index: 11;
     background-color:rgb(84, 79, 158);
+}
+
+.pick {
+    z-index: 11;
+    text-align: center;
+    background-color:rgb(84, 79, 158);
+}
+
+.pick button {
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .image-holder {
@@ -66,7 +81,7 @@ form {
     margin: 5px;
     padding: 2px;
     border: 2px solid black;
-    width: 200px;
+    /* width: 200px; */
     float: left;
 }
 

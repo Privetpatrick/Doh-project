@@ -131,7 +131,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         console.log(data);
 
-        for (let i = 0; i < 5; i++){
+        for (let i = 0; i < 15; i++){
             // console.log(data.photos[i].src.medium)
             let div = document.createElement('div');
             div.classList.add('card');
@@ -261,19 +261,28 @@ window.addEventListener('DOMContentLoaded', () => {
 
         // console.log(e);
         if (e.target.hasAttribute('src')) {
-            // console.log(resData);
+            // console.log(e.target);
             if (divPoster) {
                 divPoster.remove();
                 divPoster = 0;
             };
             resData.forEach(elem => {
-
-                if (`https://image.tmdb.org/t/p/w185${elem.poster_path}` == e.target.getAttribute('src')) {
+                if (`${elem.src.medium}` == e.target.getAttribute('src')) {
                     // console.log(elem);
                     divPoster = document.createElement('div');
                     divPoster.classList.add('poster');
-                    divPoster.innerHTML = `<div class="close"><button>Close</button></div><h3>Название: ${validateRes(elem)}</h3><img src="https://image.tmdb.org/t/p/w185${elem.poster_path}"><br /><b>Стредняя оценка:</b> ${elem.vote_average}<br /><b>Всего голосов:</b> ${elem.vote_count}<h4>Описание фильма</h4><p>${elem.overview}</p>`;
+                    divPoster.innerHTML = `<div class="close"><button>Close</button></div><h3>Фотограф: ${elem.photographer}</h3><img src="${elem.src.large}"><div class="pick"><button>Pick</button></div></p>`;
                     document.body.prepend(divPoster);
+                    let poster = document.querySelector('.poster');
+                    poster.scrollIntoView({block: "end", behavior: "smooth"});
+                    document.querySelector('.pick button').addEventListener('click', (e) => {
+                            inputUrl.value = elem.src.medium;
+                            searchPanel.innerHTML = '';
+                            searchPanel.style.display = 'none';
+                            searchValue.value = '';
+                    });
+
+                    // console.log(pick)
                     window.addEventListener('keydown', e => {
                         if (e.code == 'Escape') {
                             if (divPoster) {
