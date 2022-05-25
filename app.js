@@ -8,7 +8,7 @@ window.addEventListener('DOMContentLoaded', () => {
         } else {
             searchPanel.innerHTML = '';
             searchPanel.style.display = 'none';
-            console.log('GET не сработал, это консоль лог');
+            // console.log('GET не сработал, это консоль лог');
             throw new Error(`GET не сработал этот ERROR`);
         };
     };
@@ -23,7 +23,7 @@ window.addEventListener('DOMContentLoaded', () => {
         // console.log(post);
  
         if (!post.ok) {
-            console.log('POST не сработал, это консоль лог');
+            // console.log('POST не сработал, это консоль лог');
             throw new Error(`POST не сработал этот ERROR`);
         } else {
             resetForm();
@@ -114,7 +114,7 @@ window.addEventListener('DOMContentLoaded', () => {
         // if (anyNum.test(key)) {
             
             let keyDom = document.querySelector(`.${key}`);
-            console.log(keyDom);
+            // console.log(keyDom);
             keyDom.nextElementSibling.style.display = 'inline';
 
     }
@@ -203,6 +203,7 @@ window.addEventListener('DOMContentLoaded', () => {
             increment--;
         }
         document.querySelectorAll('.error').forEach(value => value.style.display = 'none');
+        form.deleteIngredient.style.display = 'none';
 
         return increment = 1;
     };
@@ -227,7 +228,7 @@ window.addEventListener('DOMContentLoaded', () => {
             .catch(err => new Error(`Так так, вот такая ошибка ${err}`))
     });
 
-    searchPanel.addEventListener('click', (e) => {
+    searchPanel.addEventListener('dblclick', (e) => {
         // console.log(e);
         if (e.target.hasAttribute('src')) {
             inputUrl.value = e.target.src;
