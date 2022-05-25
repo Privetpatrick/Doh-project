@@ -26,7 +26,7 @@ window.addEventListener('DOMContentLoaded', () => {
             body: json
         });
         // console.log(post);
- 
+
         if (!post.ok) {
             // console.log('POST не сработал, это консоль лог');
             throw new Error(`POST не сработал этот ERROR`);
@@ -117,11 +117,17 @@ window.addEventListener('DOMContentLoaded', () => {
         // let anyNum = /[0-9]+/;
         // console.log(anyNum.test(key));
         // if (anyNum.test(key)) {
-            
-            let keyDom = document.querySelector(`.${key}`);
-            // console.log(keyDom);
-            keyDom.nextElementSibling.style.display = 'inline';
 
+        let keyDom = document.querySelector(`.${key}`);
+        // console.log(keyDom);
+        keyDom.nextElementSibling.style.display = 'inline';
+
+    }
+
+    function getRandomNumber(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     function creatCard(data) {
@@ -129,30 +135,38 @@ window.addEventListener('DOMContentLoaded', () => {
         searchPanel.innerHTML = '';
         searchPanel.style.display = 'flex';
 
-        console.log(data);
+        console.log(data.photos);
+        let validObj = {};
 
-        for (let i = 0; i < 15; i++){
-            // console.log(data.photos[i].src.medium)
-            let div = document.createElement('div');
-            div.classList.add('card');
-            let img = document.createElement('img');
-            img.src = data.photos[i].src.medium;
-            div.append(img);
-            searchPanel.append(div);
+        for (let i = 0; i < 5; i++) {
+            let randomNum = getRandomNumber(0, 14);
 
+            if (validObj[randomNum]) {
+                i--;
+                continue;
+            } else {
+                validObj[randomNum] = true;
+                let div = document.createElement('div');
+                div.classList.add('card');
+                let img = document.createElement('img');
+                img.src = data.photos[randomNum].src.medium;
+                div.append(img);
+                searchPanel.append(div);
+            }
         };
+        validObj = {};
 
         // data.results.forEach(elem => {
         //     // console.log(elem);
         //     if (!elem.poster_path) {
         //         return;
         //     }
-            // let div = document.createElement('div');
-            // div.classList.add('card');
-            // let img = document.createElement('img');
-            // img.src = `https://image.tmdb.org/t/p/w185${elem.poster_path}`;
-            // div.append(img);
-            // searchPanel.append(div);
+        // let div = document.createElement('div');
+        // div.classList.add('card');
+        // let img = document.createElement('img');
+        // img.src = `https://image.tmdb.org/t/p/w185${elem.poster_path}`;
+        // div.append(img);
+        // searchPanel.append(div);
 
         // });
 
@@ -260,6 +274,9 @@ window.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
 
         // console.log(e);
+        console.log(window.scrollY);
+        let pickElement;
+        // console.log(e);
         if (e.target.hasAttribute('src')) {
             // console.log(e.target);
             if (divPoster) {
@@ -268,38 +285,41 @@ window.addEventListener('DOMContentLoaded', () => {
             };
             resData.forEach(elem => {
                 if (`${elem.src.medium}` == e.target.getAttribute('src')) {
-                    // console.log(elem);
-                    divPoster = document.createElement('div');
-                    divPoster.classList.add('poster');
-                    divPoster.innerHTML = `<div class="close"><button>Close</button></div><h3>Фотограф: ${elem.photographer}</h3><img src="${elem.src.large}"><div class="pick"><button>Pick</button></div></p>`;
-                    document.body.prepend(divPoster);
-                    let poster = document.querySelector('.poster');
-                    poster.scrollIntoView({block: "end", behavior: "smooth"});
-                    document.querySelector('.pick button').addEventListener('click', (e) => {
-                            inputUrl.value = elem.src.medium;
-                            searchPanel.innerHTML = '';
-                            searchPanel.style.display = 'none';
-                            searchValue.value = '';
-                    });
-
-                    // console.log(pick)
-                    window.addEventListener('keydown', e => {
-                        if (e.code == 'Escape') {
-                            if (divPoster) {
-                                divPoster.remove();
-                                divPoster = 0;
-                            };
-                        };
-                    });
-                    document.querySelector('.close').addEventListener('click', e => {
-                        // console.log(e);
-                        if (divPoster) {
-                            divPoster.remove();
-                            divPoster = 0;
-                        };
-                    });
+                    return pickElement = elem
                 };
             });
+            // console.log(elem);
+            divPoster = document.createElement('div');
+            divPoster.classList.add('poster');
+            divPoster.innerHTML = `<div class="close"><button>Close</button></div><h3>Фотограф: ${pickElement.photographer}</h3><img src="${pickElement.src.large}"><div class="pick"><button>Pick</button></div></p>`;
+            document.body.prepend(divPoster);
+            let poster = document.querySelector('.poster');
+            poster.scrollIntoView({ block: "end", behavior: "smooth" });
+            document.querySelector('.pick button').addEventListener('click', (e) => {
+                inputUrl.value = pickElement.src.medium;
+                searchPanel.innerHTML = '';
+                searchPanel.style.display = 'none';
+                searchValue.value = '';
+            });
+
+            // console.log(pick)
+            window.addEventListener('keydown', e => {
+                if (e.code == 'Escape') {
+                    if (divPoster) {
+                        divPoster.remove();
+                        divPoster = 0;
+                    };
+                };
+            });
+            document.querySelector('.close').addEventListener('click', e => {
+                // console.log(e);
+                if (divPoster) {
+                    divPoster.remove();
+                    divPoster = 0;
+                };
+            });
+
+
             window.addEventListener('click', e => {
                 if (e.target.parentElement === null) {
                     if (divPoster) {
