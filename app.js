@@ -1,7 +1,12 @@
 window.addEventListener('DOMContentLoaded', () => {
 
+    apiKey = '563492ad6f917000010000017164b7c493f14ca3a1f99c1cdaac75d7'
+
     async function getResponse(value) {
-        let response = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=b1625996a2671911894f6d328d58325e&language=en-US&query=${value}&page=1&include_adult=false`)
+        let response = await fetch(`https://api.pexels.com/v1/search?query=${value}&orientation=landscape`, {
+            method: 'GET',
+            headers: { 'Authorization': apiKey }
+        });
         // console.log(response);
         if (response.ok) {
             return await response.json();
@@ -102,7 +107,7 @@ window.addEventListener('DOMContentLoaded', () => {
             console.log(objForm);
 
             let json = JSON.stringify(objForm);
-            // console.log(json);
+            console.log(json);
             post(json);
         };
     };
@@ -124,19 +129,32 @@ window.addEventListener('DOMContentLoaded', () => {
         searchPanel.innerHTML = '';
         searchPanel.style.display = 'flex';
 
-        data.results.forEach(elem => {
-            // console.log(elem);
-            if (!elem.poster_path) {
-                return;
-            }
+        console.log(data);
+
+        for (let i = 0; i < 5; i++){
+            // console.log(data.photos[i].src.medium)
             let div = document.createElement('div');
             div.classList.add('card');
             let img = document.createElement('img');
-            img.src = `https://image.tmdb.org/t/p/w185${elem.poster_path}`;
+            img.src = data.photos[i].src.medium;
             div.append(img);
             searchPanel.append(div);
 
-        });
+        };
+
+        // data.results.forEach(elem => {
+        //     // console.log(elem);
+        //     if (!elem.poster_path) {
+        //         return;
+        //     }
+            // let div = document.createElement('div');
+            // div.classList.add('card');
+            // let img = document.createElement('img');
+            // img.src = `https://image.tmdb.org/t/p/w185${elem.poster_path}`;
+            // div.append(img);
+            // searchPanel.append(div);
+
+        // });
 
         if (searchPanel.innerHTML == '') {
             searchPanel.style.display = 'none';
@@ -223,7 +241,7 @@ window.addEventListener('DOMContentLoaded', () => {
         getResponse(e.target.value)
             .then(data => {
                 creatCard(data)
-                return resData = data.results;
+                return resData = data.photos;
             })
             .catch(err => new Error(`Так так, вот такая ошибка ${err}`))
     });
